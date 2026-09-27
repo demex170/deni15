@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0710">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="საძმაკაცოს საღამოს ინტერაქტიული მოსაწვევი">
+
+<title>საძმაკაცოს საღამო</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800;900&display=swap');
+
+:root{
+  --bg:#0a0710;
+  --bg2:#120c1c;
+  --amber:#e8a552;
+  --amber2:#ffcf8a;
+  --teal:#4fd6c0;
+  --plum:#2a1b3d;
+  --white:#f7f2ea;
+  --muted:#a89ec2;
+  --muted2:#8177a0;
+  --glass-bd:rgba(255,255,255,.14);
+  --glass-bg:rgba(255,255,255,.05);
+  --glass-bg2:rgba(255,255,255,.09);
+  --radius:26px;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:smooth; background:var(--bg); }
+
+body{
+  min-height:100vh;
+  overflow-x:hidden;
+  color:var(--white);
+  font-family:"Noto Sans Georgian",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% -5%, rgba(232,165,82,.20), transparent 60%),
+    radial-gradient(ellipse 50% 35% at 85% 15%, rgba(79,214,192,.14), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(126,60,180,.20), transparent 60%),
+    linear-gradient(180deg,var(--bg),var(--bg2) 40%,var(--bg));
+  background-attachment:fixed;
+}
+
+body::before{
+  content:"";
+  position:fixed; inset:0; pointer-events:none; z-index:100; opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+}
+
+button,input{ font:inherit; color:inherit; }
+button{ cursor:pointer; }
+button:focus-visible, input:focus-visible{ outline:2px solid var(--amber); outline-offset:3px; }
+::selection{ background:var(--amber); color:#140b04; }
+
+/* liquid glass base */
+.glass{
+  position:relative;
+  border:1px solid var(--glass-bd);
+  background:
+    linear-gradient(155deg, rgba(255,255,255,.10), rgba(255,255,255,.02) 45%, rgba(255,255,255,.05)),
+    var(--glass-bg);
+  backdrop-filter:blur(22px) saturate(150%);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -14px 30px -20px rgba(0,0,0,.6),
+    0 18px 40px -18px rgba(0,0,0,.55);
+}
+
+/* =========================
+   TOP PROGRESS / NAV
+========================= */
+
+.progress{ position:fixed; top:0; left:0; right:0; height:3px; z-index:90; background:rgba(255,255,255,.05); }
+.progress-bar{ width:0%; height:100%; background:linear-gradient(90deg,var(--teal),var(--amber)); transition:width .45s var(--ease); box-shadow:0 0 12px rgba(232,165,82,.6); }
+
+.top-nav{
+  position:fixed; top:16px; left:50%; transform:translateX(-50%);
+  width:min(92%,520px); z-index:80;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px; border-radius:999px;
+}
+.top-nav.glass{ background:rgba(15,10,24,.55); }
+
+.brand{ display:flex; align-items:center; gap:9px; font-size:12px; font-weight:700; letter-spacing:.01em; }
+.brand-mark{
+  width:26px; height:26px; border-radius:50%; display:grid; place-items:center; font-size:13px;
+  background:linear-gradient(135deg,var(--amber2),var(--amber));
+  color:#1b1206; box-shadow:0 0 14px rgba(232,165,82,.5);
+}
+.step-counter{ color:var(--muted); font-size:11px; font-weight:600; }
+.step-counter strong{ color:var(--amber2); }
+
+/* =========================
+   LAYOUT
+========================= */
+
+main{ position:relative; }
+.section{ position:relative; min-height:100svh; min-height:100dvh; padding:max(105px,12vh) 20px 70px; display:flex; flex-direction:column; justify-content:center; }
+.container{ width:min(100%,760px); margin:0 auto; }
+
+.eyebrow{ display:flex; align-items:center; gap:9px; color:var(--teal); font-size:12px; font-weight:700; margin-bottom:16px; }
+h1,h2{ font-weight:900; letter-spacing:-.03em; line-height:1.06; }
+h1{ font-size:clamp(40px,11vw,78px); }
+h2{ font-size:clamp(32px,8vw,52px); }
+
+.section-copy{ max-width:560px; margin-top:18px; color:var(--muted); font-size:14.5px; line-height:1.85; }
+.amber{ color:var(--amber2); }
+.teal{ color:var(--teal); }
+
+/* =========================
+   HERO
+========================= */
+
+.hero{ overflow:hidden; text-align:center; align-items:center; }
+.hero .container{ display:flex; flex-direction:column; align-items:center; }
+.hero .eyebrow{ justify-content:center; }
+.hero h1{ max-width:780px; }
+.hero-sub{ max-width:500px; margin:22px auto 0; color:var(--muted); font-size:15px; line-height:1.9; }
+
+.hero-meta{ display:flex; justify-content:center; flex-wrap:wrap; gap:9px; margin:30px 0; }
+.meta{ padding:10px 15px; border-radius:999px; font-size:11px; color:var(--muted); }
+.meta.glass{ background:rgba(255,255,255,.05); }
+.meta b{ color:var(--white); }
+
+.primary-btn{
+  position:relative; min-height:56px; padding:0 28px;
+  border:1px solid rgba(255,255,255,.35); border-radius:999px;
+  color:#1b1206; font-size:14px; font-weight:800;
+  background:
+    linear-gradient(160deg, rgba(255,255,255,.55), rgba(255,255,255,0) 40%),
+    linear-gradient(135deg,var(--amber2),var(--amber));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.6),
+    0 16px 40px -12px rgba(232,165,82,.55);
+  backdrop-filter:blur(6px);
+  transition:transform .35s var(--ease), box-shadow .35s var(--ease);
+}
+.primary-btn:hover{ transform:translateY(-3px); box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 22px 50px -14px rgba(232,165,82,.7); }
+.primary-btn:active{ transform:translateY(0) scale(.97); }
+
+.scroll-hint{ position:absolute; bottom:26px; left:50%; transform:translateX(-50%); color:var(--muted2); font-size:10px; letter-spacing:.1em; }
+.scroll-hint::after{ content:""; display:block; width:1px; height:30px; margin:9px auto 0; background:linear-gradient(var(--amber),transparent); }
+
+/* =========================
+   CARDS
+========================= */
+
+.section-head{ margin-bottom:28px; }
+.cards{ display:grid; grid-template-columns:repeat(2,1fr); gap:11px; }
+
+.choice{
+  position:relative; min-height:134px; padding:19px; overflow:hidden; text-align:left;
+  border-radius:var(--radius); color:var(--white);
+  transition:transform .4s var(--ease), box-shadow .4s var(--ease), background .4s var(--ease), border-color .4s var(--ease);
+}
+.choice:hover{ transform:translateY(-4px); box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 22px 46px -18px rgba(0,0,0,.6); }
+
+.choice.selected{
+  border-color:rgba(232,165,82,.55);
+  background:
+    linear-gradient(155deg, rgba(232,165,82,.28), rgba(79,214,192,.04) 55%),
+    var(--glass-bg2);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.3),
+    0 0 0 1px rgba(232,165,82,.2),
+    0 20px 44px -16px rgba(232,165,82,.35);
+}
+
+.choice-icon{ position:relative; z-index:2; display:block; margin-bottom:18px; font-size:24px; filter:drop-shadow(0 2px 6px rgba(0,0,0,.4)); }
+.choice-title{ position:relative; z-index:2; display:block; font-size:14.5px; font-weight:800; }
+.choice-desc{ position:relative; z-index:2; display:block; margin-top:5px; color:var(--muted2); font-size:10.5px; line-height:1.5; }
+
+.check{
+  position:absolute; top:14px; right:14px; z-index:3; width:23px; height:23px;
+  display:grid; place-items:center; border-radius:50%; color:transparent; font-size:11px;
+  border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.05);
+  transition:.3s var(--ease);
+}
+.choice.selected .check{ color:#1b1206; border-color:transparent; background:linear-gradient(135deg,var(--amber2),var(--amber)); box-shadow:0 0 10px rgba(232,165,82,.6); }
+
+.section-action{ display:flex; align-items:center; justify-content:space-between; gap:15px; margin-top:24px; flex-wrap:wrap; }
+.selection-info{ min-height:22px; color:var(--muted); font-size:11px; }
+.selection-info strong{ color:var(--amber2); }
+
+/* =========================
+   DATE / TIME
+========================= */
+
+.time-grid{ display:grid; grid-template-columns:1fr 1fr; gap:11px; }
+.field{ padding:19px; border-radius:var(--radius); }
+.field label{ display:block; margin-bottom:10px; color:var(--muted2); font-size:11px; }
+.field input{ width:100%; border:0; outline:0; color:var(--white); background:transparent; font-size:16px; font-weight:800; color-scheme:dark; }
+
+.quick-times{ display:flex; flex-wrap:wrap; gap:9px; margin-top:11px; }
+.quick-time{ padding:10px 14px; border-radius:999px; color:var(--muted); font-size:11px; transition:.3s var(--ease); }
+.quick-time.glass{ background:rgba(255,255,255,.04); }
+.quick-time:hover,.quick-time.active{ color:#1b1206; border-color:transparent; background:linear-gradient(135deg,var(--amber2),var(--amber)); box-shadow:0 10px 24px -10px rgba(232,165,82,.55); }
+
+/* =========================
+   MEMBERS
+========================= */
+
+.members{ display:grid; gap:10px; }
+.member{ display:flex; align-items:center; gap:13px; padding:14px; border-radius:20px; }
+
+.avatar{ flex:0 0 42px; width:42px; height:42px; display:grid; place-items:center; border-radius:50%; color:#1b1206; background:linear-gradient(135deg,var(--teal),#2c9a89); font-size:12px; font-weight:900; box-shadow:0 6px 16px -6px rgba(79,214,192,.5); }
+.member-name{ flex:1; font-size:13.5px; font-weight:800; }
+.member-status{ padding:7px 11px; border-radius:999px; font-size:10px; font-weight:700; }
+
+.status-yes{ color:#bdf0e2; background:rgba(79,214,192,.14); border:1px solid rgba(79,214,192,.25); }
+.status-maybe{ color:#f5dca8; background:rgba(232,165,82,.13); border:1px solid rgba(232,165,82,.25); }
+.status-no{ color:#e2b3c4; background:rgba(219,120,158,.1); border:1px solid rgba(219,120,158,.2); }
+
+.member-buttons{ display:flex; gap:6px; }
+.member-buttons button{ width:29px; height:29px; border-radius:50%; color:var(--muted); background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.14); font-size:11px; }
+.member-buttons button.active{ color:#1b1206; border-color:transparent; background:linear-gradient(135deg,var(--amber2),var(--amber)); box-shadow:0 0 10px rgba(232,165,82,.55); }
+
+/* =========================
+   SUMMARY
+========================= */
+
+.summary-section{ min-height:auto; padding-top:90px; padding-bottom:110px; }
+
+.summary-card{ position:relative; overflow:hidden; padding:26px; border-radius:32px; }
+.summary-card::before{ content:""; position:absolute; width:280px; height:280px; top:-140px; right:-110px; border-radius:50%; background:radial-gradient(circle,rgba(232,165,82,.18),transparent 70%); }
+.summary-card::after{ content:""; position:absolute; width:200px; height:200px; bottom:-110px; left:-70px; border-radius:50%; background:radial-gradient(circle,rgba(79,214,192,.14),transparent 70%); }
+
+.summary-top{ position:relative; z-index:2; display:flex; justify-content:space-between; gap:20px; padding-bottom:20px; border-bottom:1px solid var(--glass-bd); }
+.summary-title{ font-size:21px; font-weight:900; }
+.summary-label{ color:var(--amber2); font-size:10px; font-weight:800; letter-spacing:.08em; }
+
+.summary-items{ position:relative; z-index:2; display:grid; margin-top:5px; }
+.summary-row{ display:flex; align-items:flex-start; gap:15px; padding:17px 0; border-bottom:1px solid rgba(255,255,255,.06); }
+.summary-row:last-child{ border-bottom:0; }
+.summary-icon{ width:30px; flex:0 0 30px; color:var(--amber2); font-size:17px; }
+.summary-key{ color:var(--muted2); font-size:10px; margin-bottom:3px; }
+.summary-value{ color:var(--white); font-size:12.5px; line-height:1.7; font-weight:700; }
+
+.final-message{ text-align:center; margin-top:52px; }
+.final-message h2{ font-size:clamp(32px,8vw,56px); }
+.final-message p{ margin:18px auto 27px; color:var(--muted); font-size:13.5px; line-height:1.8; }
+
+.success{ display:none; text-align:center; padding:40px 10px 0; }
+.success.show{ display:block; animation:successIn .8s var(--ease) both; }
+@keyframes successIn{ from{ opacity:0; transform:translateY(15px);} to{ opacity:1; transform:none;} }
+
+.success-mark{ width:62px; height:62px; margin:0 auto 18px; display:grid; place-items:center; border-radius:50%; font-size:24px; color:#1b1206; background:linear-gradient(135deg,var(--amber2),var(--amber)); box-shadow:0 0 30px rgba(232,165,82,.55); }
+.success h3{ font-size:24px; }
+.success p{ margin-top:10px; color:var(--muted); font-size:12.5px; }
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{ padding:0 20px 30px; text-align:center; color:var(--muted2); font-size:10px; opacity:.7; }
+
+/* =========================
+   REVEAL
+========================= */
+
+.reveal{ opacity:0; transform:translateY(25px); transition:opacity .8s var(--ease), transform .8s var(--ease); }
+.reveal.visible{ opacity:1; transform:none; }
+
+/* =========================
+   TOAST
+========================= */
+
+.toast{
+  position:fixed; left:50%; bottom:20px; z-index:200; transform:translate(-50%,20px);
+  width:min(calc(100% - 30px),420px); padding:14px 17px; border-radius:16px;
+  text-align:center; font-size:11.5px; opacity:0; pointer-events:none; transition:.4s var(--ease);
+}
+.toast.glass{ background:rgba(20,13,30,.7); }
+.toast.show{ opacity:1; transform:translate(-50%,0); }
+
+/* =========================
+   DESKTOP
+========================= */
+
+@media(min-width:700px){
+  .section{ padding-left:30px; padding-right:30px; }
+  .cards{ grid-template-columns:repeat(3,1fr); }
+  .choice{ min-height:158px; }
+  .members{ grid-template-columns:1fr 1fr; }
+  .summary-card{ padding:42px; }
+}
+
+@media(max-width:420px){
+  .top-nav{ top:11px; }
+  .section{ padding-left:15px; padding-right:15px; }
+  .cards{ gap:8px; }
+  .choice{ min-height:128px; padding:15px; }
+  .choice-desc{ display:none; }
+  .time-grid{ grid-template-columns:1fr; }
+  .summary-card{ padding:20px; border-radius:26px; }
+  .member{ padding:11px; }
+  .member-buttons button{ width:26px; height:26px; }
+}
+
+@media(prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto; }
+  *,*::before,*::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+.identity-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:#0a0710}
+.identity-overlay.hidden{display:none}
+.identity-box{width:min(100%,520px);padding:28px;border-radius:30px;text-align:center}
+.identity-box h2{font-size:clamp(28px,8vw,44px);margin-bottom:10px}
+.identity-box p{color:var(--muted);font-size:13px;line-height:1.7;margin-bottom:22px}
+.identity-list{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.identity-btn{min-height:58px;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:var(--white);font-weight:800;transition:.25s var(--ease)}
+.identity-btn:hover,.identity-btn.selected{border-color:rgba(232,165,82,.55);background:linear-gradient(135deg,rgba(232,165,82,.25),rgba(79,214,192,.08))}
+.identity-confirm{margin-top:14px;width:100%}
+.live-note{margin-top:12px;color:var(--teal);font-size:10px}
+.member.self{border-color:rgba(232,165,82,.4)}
+.member-readonly .member-buttons{display:none}
+.member-self-label{display:inline-flex;align-items:center;padding:5px 8px;margin-left:5px;border-radius:999px;color:var(--amber2);background:rgba(232,165,82,.1);border:1px solid rgba(232,165,82,.2);font-size:9px}
+.member-updated{display:block;margin-top:3px;color:var(--muted2);font-size:9px}
+.identity-switch{display:block;margin:10px auto 0;border:0;background:none;color:var(--muted);font-size:10px;text-decoration:underline;cursor:pointer}
+</style>
+
+</head>
+
+<body>
+
+<div class="identity-overlay" id="identityOverlay">
+  <div class="identity-box glass">
+    <div class="eyebrow" style="justify-content:center">საძმაკაცო · საერთო ლინკი</div>
+    <h2>ვინ ხარ?</h2>
+    <p>აირჩიე შენი სახელი. შენი არჩევანი შეინახება საერთო სიაში და დანარჩენებიც დაინახავენ.</p>
+    <div class="identity-list" id="identityList"></div>
+    <button class="primary-btn identity-confirm" id="identityConfirm" disabled>გაგრძელება →</button>
+    <div class="live-note">● საერთო მონაცემები სინქრონიზებულია</div>
+  </div>
+</div>
+
+
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+<nav class="top-nav glass" aria-label="საიტის ნავიგაცია">
+  <div class="brand"><span class="brand-mark">S</span><span>საძმაკაცო</span></div>
+  <div class="step-counter"><strong id="currentStep">01</strong> / 06</div>
+</nav>
+
+<main>
+
+<section class="section hero" id="hero">
+  <div class="container reveal">
+    <div class="eyebrow">საძმაკაცოს მოწვევა</div>
+    <h1>ბიჭებო,<br><span class="amber">დროა შევიკრიბოთ.</span></h1>
+    <p class="hero-sub">ერთი საღამო. ერთი მაგიდა. კარგი ხალხი და კიდევ უკეთესი მოგონებები.</p>
+
+    <div class="hero-meta">
+      <div class="meta glass">📅 <b id="heroDate">თარიღი არ არის</b></div>
+      <div class="meta glass">🕐 <b id="heroTime">დრო არ არის</b></div>
+      <div class="meta glass">📍 <b id="heroLocation">ადგილი არ არის</b></div>
+    </div>
+
+    <button class="primary-btn" id="startBtn">ვნახოთ გეგმა →</button>
+  </div>
+  <div class="scroll-hint">გააგრძელე</div>
+</section>
+
+<section class="section" id="locationSection">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">01 / ადგილი</div>
+      <h2>ჯერ ადგილი<br><span class="amber">ავარჩიოთ.</span></h2>
+      <p class="section-copy">სად ვიკრიბებით ამჯერად? აირჩიე ადგილი, რომელიც ყველას მოერგება.</p>
+    </div>
+
+    <div class="cards reveal" id="locationCards">
+      <button class="choice glass" data-group="location" data-value="რესტორანი"><span class="check">✓</span><span class="choice-icon">🍽️</span><span class="choice-title">რესტორანი</span><span class="choice-desc">კარგი საჭმელი და დიდი მაგიდა.</span></button>
+      <button class="choice glass" data-group="location" data-value="პიცერია"><span class="check">✓</span><span class="choice-icon">🍕</span><span class="choice-title">პიცერია</span><span class="choice-desc">მარტივი გეგმა. კარგი პიცა.</span></button>
+      <button class="choice glass" data-group="location" data-value="ხინკლის ადგილი"><span class="check">✓</span><span class="choice-icon">🥟</span><span class="choice-title">ხინკლის ადგილი</span><span class="choice-desc">კლასიკა, რომელსაც ახსნა არ სჭირდება.</span></button>
+      <button class="choice glass" data-group="location" data-value="გასართობი ადგილი"><span class="check">✓</span><span class="choice-icon">🎳</span><span class="choice-title">გასართობი</span><span class="choice-desc">ჯერ თამაში, მერე საჭმელი.</span></button>
+      <button class="choice glass" data-group="location" data-value="კაფე"><span class="check">✓</span><span class="choice-icon">☕</span><span class="choice-title">კაფე</span><span class="choice-desc">მშვიდი საღამოსთვის.</span></button>
+      <button class="choice glass" data-group="location" data-value="სხვა ადგილი"><span class="check">✓</span><span class="choice-icon">✦</span><span class="choice-title">სხვა ადგილი</span><span class="choice-desc">შენი იდეა.</span></button>
+    </div>
+
+    <div class="section-action reveal">
+      <div class="selection-info" id="locationInfo">ჯერ არაფერი აგვირჩევია.</div>
+      <button class="primary-btn next-btn" data-next="foodSection">შემდეგი →</button>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="foodSection">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">02 / მენიუ</div>
+      <h2>ახლა<br><span class="amber">მთავარი საკითხი.</span></h2>
+      <p class="section-copy">რა იქნება მაგიდაზე? შეგიძლია რამდენიმე ვარიანტი აირჩიო.</p>
+    </div>
+
+    <div class="cards reveal" id="foodCards">
+      <button class="choice multi glass" data-group="food" data-value="ხინკალი"><span class="check">✓</span><span class="choice-icon">🥟</span><span class="choice-title">ხინკალი</span></button>
+      <button class="choice multi glass" data-group="food" data-value="ხაჭაპური"><span class="check">✓</span><span class="choice-icon">🧀</span><span class="choice-title">ხაჭაპური</span></button>
+      <button class="choice multi glass" data-group="food" data-value="მწვადი"><span class="check">✓</span><span class="choice-icon">🥩</span><span class="choice-title">მწვადი</span></button>
+      <button class="choice multi glass" data-group="food" data-value="პიცა"><span class="check">✓</span><span class="choice-icon">🍕</span><span class="choice-title">პიცა</span></button>
+      <button class="choice multi glass" data-group="food" data-value="ბურგერები"><span class="check">✓</span><span class="choice-icon">🍔</span><span class="choice-title">ბურგერები</span></button>
+      <button class="choice multi glass" data-group="food" data-value="ფრი"><span class="check">✓</span><span class="choice-icon">🍟</span><span class="choice-title">ფრი</span></button>
+      <button class="choice multi glass" data-group="food" data-value="სალათები"><span class="check">✓</span><span class="choice-icon">🥗</span><span class="choice-title">სალათები</span></button>
+      <button class="choice multi glass" data-group="food" data-value="ფრთები"><span class="check">✓</span><span class="choice-icon">🍗</span><span class="choice-title">ფრთები</span></button>
+      <button class="choice multi glass" data-group="food" data-value="დესერტი"><span class="check">✓</span><span class="choice-icon">🍰</span><span class="choice-title">დესერტი</span></button>
+    </div>
+
+    <div class="section-action reveal">
+      <div class="selection-info">არჩეულია: <strong id="foodCount">0</strong></div>
+      <button class="primary-btn next-btn" data-next="activitySection">მენიუ მზადაა →</button>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="activitySection">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">03 / აქტივობა</div>
+      <h2>მერე?<br><span class="amber">გეგმა გავაგრძელოთ.</span></h2>
+      <p class="section-copy">საჭმლის შემდეგ რას ვაკეთებთ?</p>
+    </div>
+
+    <div class="cards reveal">
+      <button class="choice glass" data-group="activity" data-value="ბოულინგი"><span class="check">✓</span><span class="choice-icon">🎳</span><span class="choice-title">ბოულინგი</span><span class="choice-desc">ვნახოთ ვინ წააგებს პირველი.</span></button>
+      <button class="choice glass" data-group="activity" data-value="ბილიარდი"><span class="check">✓</span><span class="choice-icon">🎱</span><span class="choice-title">ბილიარდი</span><span class="choice-desc">ცოტა შეჯიბრიც შეიძლება.</span></button>
+      <button class="choice glass" data-group="activity" data-value="თამაშები"><span class="check">✓</span><span class="choice-icon">🎮</span><span class="choice-title">თამაშები</span><span class="choice-desc">კონკურენცია აუცილებელია.</span></button>
+      <button class="choice glass" data-group="activity" data-value="კინო"><span class="check">✓</span><span class="choice-icon">🎬</span><span class="choice-title">კინო</span><span class="choice-desc">ორი საათი მშვიდად.</span></button>
+      <button class="choice glass" data-group="activity" data-value="გასეირნება"><span class="check">✓</span><span class="choice-icon">🚶</span><span class="choice-title">გასეირნება</span><span class="choice-desc">უბრალოდ ქალაქში გასვლა.</span></button>
+      <button class="choice glass" data-group="activity" data-value="უბრალოდ მაგიდა"><span class="check">✓</span><span class="choice-icon">🔥</span><span class="choice-title">უბრალოდ მაგიდა</span><span class="choice-desc">საუბარი და კარგი საღამო.</span></button>
+    </div>
+
+    <div class="section-action reveal">
+      <div class="selection-info" id="activityInfo">აირჩიე აქტივობა.</div>
+      <button class="primary-btn next-btn" data-next="timeSection">შემდეგი →</button>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="timeSection">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">04 / დრო</div>
+      <h2>ახლა დრო<br><span class="amber">დავაფიქსიროთ.</span></h2>
+      <p class="section-copy">როდის შევიკრიბოთ?</p>
+    </div>
+
+    <div class="time-grid reveal">
+      <div class="field glass"><label for="dateInput">თარიღი</label><input id="dateInput" type="date"></div>
+      <div class="field glass"><label for="timeInput">შეკრების დრო</label><input id="timeInput" type="time"></div>
+    </div>
+
+    <div class="quick-times reveal">
+      <button class="quick-time glass" data-time="18:00">18:00</button>
+      <button class="quick-time glass" data-time="19:00">19:00</button>
+      <button class="quick-time glass" data-time="20:00">20:00</button>
+      <button class="quick-time glass" data-time="21:00">21:00</button>
+    </div>
+
+    <div class="section-action reveal">
+      <div class="selection-info" id="timeInfo">დრო ჯერ არ არის არჩეული.</div>
+      <button class="primary-btn next-btn" data-next="membersSection">შემდეგი →</button>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="membersSection">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">05 / ხალხი</div>
+      <h2>საძმაკაცო<br><span class="amber">მზადაა?</span></h2>
+      <p class="section-copy">შენი სტატუსი შენ შეცვალე. დანარჩენი წევრების პასუხებს ყველა დაინახავს.</p><button class="identity-switch" id="identitySwitch">მე სხვა წევრი ვარ</button>
+    </div>
+
+    <div class="members reveal" id="membersList"></div>
+
+    <div class="section-action reveal">
+      <div class="selection-info" id="membersInfo"></div>
+      <button class="primary-btn next-btn" data-next="summarySection">გეგმის ნახვა →</button>
+    </div>
+  </div>
+</section>
+
+<section class="section summary-section" id="summarySection">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">06 / დასრულება</div>
+      <h2>აი ჩვენი<br><span class="amber">გეგმა.</span></h2>
+    </div>
+
+    <div class="summary-card glass reveal">
+      <div class="summary-top">
+        <div><div class="summary-label">საძმაკაცოს საღამო</div><div class="summary-title">შეკრების გეგმა</div></div>
+        <div class="summary-label">CONFIRMED</div>
+      </div>
+
+      <div class="summary-items">
+        <div class="summary-row"><div class="summary-icon">📅</div><div><div class="summary-key">თარიღი</div><div class="summary-value" id="summaryDate">—</div></div></div>
+        <div class="summary-row"><div class="summary-icon">🕐</div><div><div class="summary-key">დრო</div><div class="summary-value" id="summaryTime">—</div></div></div>
+        <div class="summary-row"><div class="summary-icon">📍</div><div><div class="summary-key">ადგილი</div><div class="summary-value" id="summaryLocation">—</div></div></div>
+        <div class="summary-row"><div class="summary-icon">🍽️</div><div><div class="summary-key">საჭმელი</div><div class="summary-value" id="summaryFood">—</div></div></div>
+        <div class="summary-row"><div class="summary-icon">🎮</div><div><div class="summary-key">აქტივობა</div><div class="summary-value" id="summaryActivity">—</div></div></div>
+        <div class="summary-row"><div class="summary-icon">👥</div><div><div class="summary-key">ვინც მოდის</div><div class="summary-value" id="summaryMembers">—</div></div></div>
+      </div>
+    </div>
+
+    <div class="final-message reveal" id="finalMessage">
+      <h2>დანარჩენი<br><span class="amber">ადგილზე გადაწყდება.</span></h2>
+      <p>მთავარია ყველა ვიყოთ.<br>დანარჩენი უკვე საღამოს საქმეა.</p>
+      <button class="primary-btn" id="confirmBtn">დავაფიქსიროთ საღამო →</button>
+    </div>
+
+    <div class="success" id="success">
+      <div class="success-mark">✓</div>
+      <h3>საღამო დაფიქსირდა.</h3>
+      <p>ახლა უკვე გეგმა გვაქვს.<br>შევხვდებით იქ.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>საძმაკაცოს საღამო · ერთი კარგი გეგმა</footer>
+
+<div class="toast glass" id="toast"></div>
+
+<script>
+"use strict";
+
+const CONFIG = {
+  title: "საძმაკაცოს საღამო",
+  members: ["დემე","გიორგი","ნიკა","დათო"],
+
+  // SUPABASE — ჩასვი შენი Project URL და Publishable/Anon key
+  supabaseUrl: "https://ioisupqgqwejwecqycfw.supabase.co",
+  supabaseKey: "sb_publishable__YgAt67XGtHqT0OFwAFS-A_39ztZTUV",
+
+  // ოთხივე ერთ ოთახს იყენებს
+  roomId: "sadzmakacoso-2026",
+
+  // FORMSPREE — ჩასვი შენი endpoint
+  formspreeEndpoint: "YOUR_FORMSPREE_ENDPOINT"
+};
+
+const state = {
+  location:null, foods:[], activity:null, date:"", time:"",
+  members:{}, currentUser:null, saving:false
+};
+
+CONFIG.members.forEach(name => {
+  state.members[name] = {
+    status:"unknown", location:null, foods:[], activity:null, date:"", time:"", updated_at:null
+  };
+});
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+const progressBar = $("#progressBar");
+const currentStep = $("#currentStep");
+const toast = $("#toast");
+
+function getInitials(name){ return name.split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase(); }
+function statusText(status){ if(status==="yes") return "მოვდივარ"; if(status==="maybe") return "არ ვიცი"; return "ვერ მოვდივარ"; }
+
+function renderMembers(){
+  const container = $("#membersList");
+  container.innerHTML = CONFIG.members.map(name => {
+    const data = state.members[name] || {};
+    const status = data.status || "unknown";
+    const isSelf = name === state.currentUser;
+    const statusLabel = status === "yes" ? "მოვდივარ" : status === "maybe" ? "არ ვიცი" : status === "no" ? "ვერ მოვდივარ" : "ჯერ არ უპასუხია";
+    const statusClass = status === "yes" ? "status-yes" : status === "maybe" ? "status-maybe" : status === "no" ? "status-no" : "";
+    const details = [
+      data.location ? "📍 " + data.location : "",
+      data.foods?.length ? "🍽️ " + data.foods.join(" · ") : "",
+      data.activity ? "🎮 " + data.activity : "",
+      data.date ? "📅 " + formatDate(data.date) : "",
+      data.time ? "🕐 " + data.time : ""
+    ].filter(Boolean).join(" · ");
+
+    return `
+      <div class="member glass ${isSelf ? "self" : "member-readonly"}">
+        <div class="avatar">${getInitials(name)}</div>
+        <div class="member-name">
+          ${escapeHTML(name)} ${isSelf ? '<span class="member-self-label">შენ</span>' : ""}
+          ${details ? `<span class="member-updated">${escapeHTML(details)}</span>` : ""}
+        </div>
+        <div class="member-status ${statusClass}">${statusLabel}</div>
+        <div class="member-buttons">
+          <button class="${status==="yes"?"active":""}" data-member="${escapeHTML(name)}" data-status="yes">✓</button>
+          <button class="${status==="maybe"?"active":""}" data-member="${escapeHTML(name)}" data-status="maybe">?</button>
+          <button class="${status==="no"?"active":""}" data-member="${escapeHTML(name)}" data-status="no">×</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+  updateMembersInfo();
+}
+
+$("#membersList").addEventListener("click", async event => {
+  const button = event.target.closest("[data-member]");
+  if(!button || button.dataset.member !== state.currentUser) return;
+
+  state.members[state.currentUser] = {
+    ...(state.members[state.currentUser] || {}),
+    status: button.dataset.status
+  };
+
+  renderMembers();
+  updateSummary();
+  await saveCurrentUser(false);
+});
+
+$$(".choice").forEach(card => {
+  card.addEventListener("click", () => {
+    const group = card.dataset.group;
+    const value = card.dataset.value;
+
+    if(group === "location"){
+      state.location = value;
+      $$(`[data-group="location"]`).forEach(item => item.classList.remove("selected"));
+      card.classList.add("selected");
+      updateLocationInfo();
+      updateSummary();
+    }
+
+    if(group === "activity"){
+      state.activity = value;
+      $$(`[data-group="activity"]`).forEach(item => item.classList.remove("selected"));
+      card.classList.add("selected");
+      updateActivityInfo();
+      updateSummary();
+    }
+
+    if(group === "food"){
+      const exists = state.foods.includes(value);
+      if(exists){
+        state.foods = state.foods.filter(item => item !== value);
+        card.classList.remove("selected");
+      } else {
+        state.foods.push(value);
+        card.classList.add("selected");
+      }
+      $("#foodCount").textContent = state.foods.length;
+      updateSummary();
+    }
+  });
+});
+
+const dateInput = $("#dateInput");
+const timeInput = $("#timeInput");
+
+dateInput.addEventListener("change", () => { state.date = dateInput.value; updateTimeInfo(); updateSummary(); });
+timeInput.addEventListener("change", () => { state.time = timeInput.value; updateTimeInfo(); updateSummary(); });
+
+$$(".quick-time").forEach(button => {
+  button.addEventListener("click", () => {
+    state.time = button.dataset.time;
+    timeInput.value = state.time;
+    $$(".quick-time").forEach(item => item.classList.remove("active"));
+    button.classList.add("active");
+    updateTimeInfo();
+    updateSummary();
+  });
+});
+
+function updateLocationInfo(){
+  $("#locationInfo").innerHTML = `არჩეულია: <strong>${escapeHTML(state.location)}</strong>`;
+  $("#heroLocation").textContent = state.location;
+}
+function updateActivityInfo(){ $("#activityInfo").innerHTML = `აქტივობა: <strong>${escapeHTML(state.activity)}</strong>`; }
+
+function updateTimeInfo(){
+  const parts = [];
+  if(state.date) parts.push(formatDate(state.date));
+  if(state.time) parts.push(state.time);
+  $("#timeInfo").innerHTML = parts.length ? `დაფიქსირდა: <strong>${parts.join(" · ")}</strong>` : "დრო ჯერ არ არის არჩეული.";
+  $("#heroDate").textContent = state.date ? formatDate(state.date) : "თარიღი არ არის";
+  $("#heroTime").textContent = state.time || "დრო არ არის";
+}
+
+function updateMembersInfo(){
+  const yes = Object.values(state.members).filter(s=>s.status==="yes").length;
+  const answered = Object.values(state.members).filter(s=>["yes","maybe","no"].includes(s.status)).length;
+  $("#membersInfo").innerHTML = `<strong>${yes}</strong> მოვდივარ · <strong>${answered}</strong> პასუხი ${CONFIG.members.length}-დან`;
+}
+
+function updateSummary(){
+  $("#summaryDate").textContent = state.date ? formatDate(state.date) : "თარიღი არ არის";
+  $("#summaryTime").textContent = state.time || "დრო არ არის არჩეული";
+  $("#summaryLocation").textContent = state.location || "ადგილი არ არის არჩეული";
+  $("#summaryFood").textContent = state.foods.length ? state.foods.join(" · ") : "მენიუ არ არის არჩეული";
+  $("#summaryActivity").textContent = state.activity || "აქტივობა არ არის არჩეული";
+  const coming = Object.entries(state.members).filter(([n,s])=>s.status==="yes").map(([n])=>n);
+  $("#summaryMembers").textContent = coming.length ? coming.join(" · ") : "ჯერ არავინ დადასტურებულა";
+}
+
+function validateStep(target){
+  if(target === "foodSection" && !state.location){ showToast("ჯერ ადგილი ავარჩიოთ."); return false; }
+  if(target === "activitySection" && state.foods.length === 0){ showToast("ერთი საჭმელი მაინც ავარჩიოთ."); return false; }
+  if(target === "timeSection" && !state.activity){ showToast("ჯერ აქტივობა ავარჩიოთ."); return false; }
+  if(target === "membersSection" && (!state.date || !state.time)){ showToast("ჯერ თარიღი და დრო დავაფიქსიროთ."); return false; }
+  if(target === "summarySection"){
+    const hasComing = Object.values(state.members).some(s=>s.status==="yes");
+    if(!hasComing){ showToast("მინიმუმ ერთი მონაწილე უნდა მოვიდეს."); return false; }
+  }
+  return true;
+}
+
+$$(".next-btn").forEach(button => {
+  button.addEventListener("click", () => {
+    const target = button.dataset.next;
+    if(!validateStep(target)) return;
+    const section = document.getElementById(target);
+    if(section) section.scrollIntoView({ behavior:"smooth", block:"start" });
+  });
+});
+
+$("#startBtn").addEventListener("click", () => {
+  $("#locationSection").scrollIntoView({ behavior:"smooth", block:"start" });
+});
+
+$("#confirmBtn").addEventListener("click", async () => {
+  if(!state.currentUser){
+    showToast("ჯერ აირჩიე ვინ ხარ.");
+    $("#identityOverlay").classList.remove("hidden");
+    return;
+  }
+
+  updateSummary();
+  const ok = await saveCurrentUser(true);
+  if(!ok) return;
+
+  $("#finalMessage").style.display = "none";
+  $("#success").classList.add("show");
+  setTimeout(() => {
+    $("#success").scrollIntoView({ behavior:"smooth", block:"center" });
+  }, 100);
+});
+
+
+/* =========================
+   SHARED DATABASE + REALTIME
+========================= */
+
+const SUPABASE_CONFIGURED =
+  CONFIG.supabaseUrl && CONFIG.supabaseKey &&
+  !CONFIG.supabaseUrl.startsWith("YOUR_") &&
+  !CONFIG.supabaseKey.startsWith("YOUR_");
+
+const FORMSPREE_CONFIGURED =
+  CONFIG.formspreeEndpoint && !CONFIG.formspreeEndpoint.startsWith("YOUR_");
+
+const supabaseClient = SUPABASE_CONFIGURED
+  ? window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey)
+  : null;
+
+function memberPayload(){
+  const me = state.members[state.currentUser] || {};
+  return {
+    room_id: CONFIG.roomId,
+    member_name: state.currentUser,
+    status: me.status || "unknown",
+    location: state.location || null,
+    foods: state.foods || [],
+    activity: state.activity || null,
+    response_date: state.date || null,
+    response_time: state.time || null,
+    updated_at: new Date().toISOString()
+  };
+}
+
+function applyRemoteRow(row){
+  if(!row?.member_name || !CONFIG.members.includes(row.member_name)) return;
+
+  state.members[row.member_name] = {
+    status: row.status || "unknown",
+    location: row.location || null,
+    foods: Array.isArray(row.foods) ? row.foods : [],
+    activity: row.activity || null,
+    date: row.response_date || "",
+    time: row.response_time || "",
+    updated_at: row.updated_at || null
+  };
+
+  if(row.member_name === state.currentUser){
+    state.location = row.location || null;
+    state.foods = Array.isArray(row.foods) ? row.foods : [];
+    state.activity = row.activity || null;
+    state.date = row.response_date || "";
+    state.time = row.response_time || "";
+    syncLocalUI();
+  }
+
+  renderMembers();
+  updateSummary();
+}
+
+async function loadSharedData(){
+  if(!supabaseClient) return;
+
+  const { data, error } = await supabaseClient
+    .from("sadzmakacoso_responses")
+    .select("*")
+    .eq("room_id", CONFIG.roomId);
+
+  if(error){
+    console.error(error);
+    showToast("Database-თან დაკავშირება ვერ მოხერხდა.");
+    return;
+  }
+
+  (data || []).forEach(applyRemoteRow);
+}
+
+async function saveCurrentUser(sendFormspree = false){
+  if(!state.currentUser) return false;
+
+  if(!supabaseClient){
+    showToast("Supabase ჯერ არ არის ჩართული.");
+    return false;
+  }
+
+  const payload = memberPayload();
+
+  const { data, error } = await supabaseClient
+    .from("sadzmakacoso_responses")
+    .upsert(payload, { onConflict:"room_id,member_name" })
+    .select()
+    .single();
+
+  if(error){
+    console.error(error);
+    showToast("პასუხის შენახვა ვერ მოხერხდა.");
+    return false;
+  }
+
+  applyRemoteRow(data);
+
+  if(sendFormspree) await sendToFormspree(data);
+  return true;
+}
+
+async function sendToFormspree(row){
+  if(!FORMSPREE_CONFIGURED){
+    console.warn("Formspree endpoint is not configured.");
+    return;
+  }
+
+  const body = new URLSearchParams({
+    name: row.member_name,
+    status: row.status,
+    location: row.location || "არ არის არჩეული",
+    food: Array.isArray(row.foods) && row.foods.length ? row.foods.join(", ") : "არ არის არჩეული",
+    activity: row.activity || "არ არის არჩეული",
+    date: row.response_date || "არ არის არჩეული",
+    time: row.response_time || "არ არის არჩეული",
+    room: CONFIG.roomId
+  });
+
+  try{
+    const response = await fetch(CONFIG.formspreeEndpoint, {
+      method:"POST",
+      headers:{
+        "Accept":"application/json",
+        "Content-Type":"application/x-www-form-urlencoded"
+      },
+      body
+    });
+
+    if(!response.ok){
+      console.error("Formspree:", await response.text());
+      showToast("Database-ში შეინახა, მაგრამ Formspree-ზე ვერ გაიგზავნა.");
+      return;
+    }
+
+    showToast("პასუხი შენახულია ✓");
+  }catch(error){
+    console.error(error);
+    showToast("Database-ში შეინახა, მაგრამ Formspree-ზე ვერ გაიგზავნა.");
+  }
+}
+
+function subscribeRealtime(){
+  if(!supabaseClient) return;
+
+  supabaseClient
+    .channel("sadzmakacoso-live-" + CONFIG.roomId)
+    .on("postgres_changes", {
+      event:"*",
+      schema:"public",
+      table:"sadzmakacoso_responses",
+      filter:"room_id=eq." + CONFIG.roomId
+    }, payload => {
+      if(payload.eventType === "DELETE"){
+        const name = payload.old?.member_name;
+        if(name){
+          state.members[name] = {
+            status:"unknown",location:null,foods:[],activity:null,date:"",time:""
+          };
+          renderMembers();
+          updateSummary();
+        }
+        return;
+      }
+
+      applyRemoteRow(payload.new);
+    })
+    .subscribe();
+}
+
+function syncLocalUI(){
+  $$(`[data-group="location"]`).forEach(item =>
+    item.classList.toggle("selected", item.dataset.value === state.location)
+  );
+  if(state.location) updateLocationInfo();
+
+  $$(`[data-group="food"]`).forEach(item =>
+    item.classList.toggle("selected", state.foods.includes(item.dataset.value))
+  );
+  $("#foodCount").textContent = state.foods.length;
+
+  $$(`[data-group="activity"]`).forEach(item =>
+    item.classList.toggle("selected", item.dataset.value === state.activity)
+  );
+  if(state.activity) updateActivityInfo();
+
+  dateInput.value = state.date || "";
+  timeInput.value = state.time || "";
+  $$(".quick-time").forEach(item =>
+    item.classList.toggle("active", item.dataset.time === state.time)
+  );
+  updateTimeInfo();
+}
+
+function renderIdentityChooser(){
+  const list = $("#identityList");
+
+  list.innerHTML = CONFIG.members.map(name =>
+    `<button class="identity-btn" data-identity="${escapeHTML(name)}">${escapeHTML(name)}</button>`
+  ).join("");
+
+  list.addEventListener("click", event => {
+    const button = event.target.closest("[data-identity]");
+    if(!button) return;
+
+    state.currentUser = button.dataset.identity;
+    $$("#identityList .identity-btn").forEach(b =>
+      b.classList.toggle("selected", b === button)
+    );
+    $("#identityConfirm").disabled = false;
+  });
+}
+
+async function enterAsSelectedUser(){
+  if(!state.currentUser) return;
+
+  localStorage.setItem("sadzmakacoso_member", state.currentUser);
+  $("#identityOverlay").classList.add("hidden");
+
+  await loadSharedData();
+
+  const saved = state.members[state.currentUser];
+  if(saved && saved.status !== "unknown"){
+    state.location = saved.location || null;
+    state.foods = saved.foods || [];
+    state.activity = saved.activity || null;
+    state.date = saved.date || "";
+    state.time = saved.time || "";
+    syncLocalUI();
+  }
+
+  renderMembers();
+  updateSummary();
+  subscribeRealtime();
+}
+
+$("#identityConfirm").addEventListener("click", enterAsSelectedUser);
+
+$("#identitySwitch").addEventListener("click", () => {
+  $("#identityOverlay").classList.remove("hidden");
+  $("#identityConfirm").disabled = true;
+  $$("#identityList .identity-btn").forEach(b => b.classList.remove("selected"));
+});
+
+renderIdentityChooser();
+
+const savedIdentity = localStorage.getItem("sadzmakacoso_member");
+if(savedIdentity && CONFIG.members.includes(savedIdentity)){
+  state.currentUser = savedIdentity;
+  const selectedBtn = document.querySelector(`[data-identity="${CSS.escape(savedIdentity)}"]`);
+  if(selectedBtn){
+    selectedBtn.classList.add("selected");
+    $("#identityConfirm").disabled = false;
+  }
+}
+
+function formatDate(value){
+  if(!value) return "";
+  const date = new Date(value + "T12:00:00");
+  if(Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("ka-GE", { day:"numeric", month:"long", year:"numeric" }).format(date);
+}
+
+let toastTimer;
+function showToast(message){
+  clearTimeout(toastTimer);
+  toast.textContent = message;
+  toast.classList.add("show");
+  toastTimer = setTimeout(() => { toast.classList.remove("show"); }, 2600);
+}
+
+function escapeHTML(value){
+  return String(value).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+
+function updateProgress(){
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = height > 0 ? Math.min(100,(scrollTop/height)*100) : 0;
+  progressBar.style.width = progress + "%";
+
+  const sections = ["hero","locationSection","foodSection","activitySection","timeSection","membersSection","summarySection"];
+  let closest = 0, distance = Infinity;
+  sections.forEach((id,index) => {
+    const element = document.getElementById(id);
+    if(!element) return;
+    const rect = element.getBoundingClientRect();
+    const d = Math.abs(rect.top - window.innerHeight*.3);
+    if(d < distance){ distance = d; closest = index; }
+  });
+  currentStep.textContent = String(Math.min(6,Math.max(1,closest))).padStart(2,"0");
+}
+
+window.addEventListener("scroll", updateProgress, { passive:true });
+window.addEventListener("resize", updateProgress);
+
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){ entry.target.classList.add("visible"); revealObserver.unobserve(entry.target); }
+  });
+}, { threshold:.12, rootMargin:"0px 0px -40px" });
+
+$$(".reveal").forEach(element => revealObserver.observe(element));
+
+renderMembers();
+updateSummary();
+updateProgress();
+</script>
+
+</body>
+</html>
