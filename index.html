@@ -175,6 +175,8 @@ h2{ font-size:clamp(32px,8vw,52px); }
 .choice-icon{ position:relative; z-index:2; display:block; margin-bottom:18px; font-size:24px; filter:drop-shadow(0 2px 6px rgba(0,0,0,.4)); }
 .choice-title{ position:relative; z-index:2; display:block; font-size:14.5px; font-weight:800; }
 .choice-desc{ position:relative; z-index:2; display:block; margin-top:5px; color:var(--muted2); font-size:10.5px; line-height:1.5; }
+.choice-voters{ position:relative; z-index:2; display:block; margin-top:9px; min-height:11px; color:var(--amber2); font-size:9.5px; font-weight:700; }
+.choice.selected .choice-voters{ color:#5c3d0f; }
 
 .check{
   position:absolute; top:14px; right:14px; z-index:3; width:23px; height:23px;
@@ -201,6 +203,21 @@ h2{ font-size:clamp(32px,8vw,52px); }
 .quick-time{ padding:10px 14px; border-radius:999px; color:var(--muted); font-size:11px; transition:.3s var(--ease); }
 .quick-time.glass{ background:rgba(255,255,255,.04); }
 .quick-time:hover,.quick-time.active{ color:#1b1206; border-color:transparent; background:linear-gradient(135deg,var(--amber2),var(--amber)); box-shadow:0 10px 24px -10px rgba(232,165,82,.55); }
+
+.date-strip-label{ display:block; margin-bottom:12px; color:var(--muted2); font-size:11px; }
+.date-strip{ display:flex; gap:10px; overflow-x:auto; padding:2px 2px 8px; scrollbar-width:none; }
+.date-strip::-webkit-scrollbar{ display:none; }
+.date-pill{
+  flex:0 0 auto; width:66px; padding:15px 0 13px; border-radius:20px;
+  display:flex; flex-direction:column; align-items:center; gap:7px; color:var(--muted);
+  transition:transform .3s var(--ease), background .3s var(--ease), box-shadow .3s var(--ease), color .3s var(--ease);
+}
+.date-pill .dow{ font-size:10px; font-weight:700; letter-spacing:.02em; }
+.date-pill .dom{ font-size:20px; font-weight:900; color:var(--white); }
+.date-pill.today .dow{ color:var(--teal); }
+.date-pill:hover{ transform:translateY(-2px); }
+.date-pill.active{ color:#1b1206; border-color:transparent; background:linear-gradient(135deg,var(--amber2),var(--amber)); box-shadow:0 12px 28px -12px rgba(232,165,82,.6); transform:translateY(-2px); }
+.date-pill.active .dom, .date-pill.active .dow{ color:#1b1206; }
 
 /* =========================
    MEMBERS
@@ -311,21 +328,74 @@ footer{ padding:0 20px 30px; text-align:center; color:var(--muted2); font-size:1
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-.identity-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:#0a0710}
-.identity-overlay.hidden{display:none}
-.identity-box{width:min(100%,520px);padding:28px;border-radius:30px;text-align:center}
-.identity-box h2{font-size:clamp(28px,8vw,44px);margin-bottom:10px}
-.identity-box p{color:var(--muted);font-size:13px;line-height:1.7;margin-bottom:22px}
-.identity-list{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.identity-btn{min-height:58px;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:var(--white);font-weight:800;transition:.25s var(--ease)}
-.identity-btn:hover,.identity-btn.selected{border-color:rgba(232,165,82,.55);background:linear-gradient(135deg,rgba(232,165,82,.25),rgba(79,214,192,.08))}
-.identity-confirm{margin-top:14px;width:100%}
-.live-note{margin-top:12px;color:var(--teal);font-size:10px}
+.identity-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:
+    radial-gradient(ellipse 60% 45% at 25% 0%, rgba(232,165,82,.22), transparent 60%),
+    radial-gradient(ellipse 55% 40% at 90% 20%, rgba(79,214,192,.16), transparent 60%),
+    radial-gradient(ellipse 70% 55% at 50% 100%, rgba(126,60,180,.22), transparent 60%),
+    linear-gradient(180deg,var(--bg),var(--bg2) 45%,var(--bg));
+  transition:opacity .5s var(--ease), visibility .5s var(--ease);
+}
+.identity-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.identity-box{position:relative;width:min(100%,540px);padding:38px 30px;border-radius:34px;text-align:center;animation:identityIn .7s var(--ease) both}
+@keyframes identityIn{ from{ opacity:0; transform:translateY(18px) scale(.97);} to{ opacity:1; transform:none;} }
+.identity-box .eyebrow{justify-content:center}
+.identity-box h2{font-size:clamp(30px,9vw,46px);margin-bottom:10px;letter-spacing:-.03em}
+.identity-box p{color:var(--muted);font-size:13px;line-height:1.7;margin-bottom:26px;max-width:380px;margin-left:auto;margin-right:auto}
+.identity-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.identity-btn{
+  position:relative;min-height:118px;padding:18px 12px;border-radius:22px;
+  border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--white);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;
+  opacity:0;transform:translateY(14px) scale(.95);
+  animation:identityCardIn .6s var(--ease) both;
+  transition:transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s var(--ease), background .35s var(--ease);
+}
+.identity-list .identity-btn:nth-child(1){animation-delay:.05s}
+.identity-list .identity-btn:nth-child(2){animation-delay:.13s}
+.identity-list .identity-btn:nth-child(3){animation-delay:.21s}
+.identity-list .identity-btn:nth-child(4){animation-delay:.29s}
+@keyframes identityCardIn{ to{ opacity:1; transform:none; } }
+.identity-btn:hover{transform:translateY(-4px)}
+.identity-avatar{
+  width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+  font-size:14px;font-weight:900;color:#1b1206;
+  background:linear-gradient(135deg,var(--teal),#2c9a89);
+  box-shadow:0 6px 18px -6px rgba(79,214,192,.55);
+  transition:.35s var(--ease);
+}
+.identity-btn-name{font-size:13.5px;font-weight:800}
+.identity-btn.selected{
+  border-color:rgba(232,165,82,.6);
+  background:linear-gradient(155deg,rgba(232,165,82,.26),rgba(79,214,192,.06) 60%),rgba(255,255,255,.06);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 0 0 1px rgba(232,165,82,.25), 0 18px 40px -16px rgba(232,165,82,.4);
+  transform:translateY(-4px);
+}
+.identity-btn.selected .identity-avatar{background:linear-gradient(135deg,var(--amber2),var(--amber));box-shadow:0 0 16px rgba(232,165,82,.6)}
+.identity-confirm{margin-top:20px;width:100%;opacity:.4;pointer-events:none;transition:opacity .35s var(--ease), transform .35s var(--ease)}
+.identity-confirm:not(:disabled){opacity:1;pointer-events:auto}
+.live-note{margin-top:14px;color:var(--teal);font-size:10px;display:flex;align-items:center;justify-content:center;gap:6px}
+.live-note::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal);animation:pulseDot 1.8s ease-in-out infinite}
+@keyframes pulseDot{ 0%,100%{opacity:1} 50%{opacity:.35} }
 .member.self{border-color:rgba(232,165,82,.4)}
 .member-readonly .member-buttons{display:none}
 .member-self-label{display:inline-flex;align-items:center;padding:5px 8px;margin-left:5px;border-radius:999px;color:var(--amber2);background:rgba(232,165,82,.1);border:1px solid rgba(232,165,82,.2);font-size:9px}
 .member-updated{display:block;margin-top:3px;color:var(--muted2);font-size:9px}
 .identity-switch{display:block;margin:10px auto 0;border:0;background:none;color:var(--muted);font-size:10px;text-decoration:underline;cursor:pointer}
+
+/* ===== window / page transition curtain ===== */
+.curtain{position:fixed;inset:0;z-index:500;pointer-events:none;opacity:0;
+  background:radial-gradient(circle at var(--cx,50%) var(--cy,50%), rgba(232,165,82,.35), rgba(10,7,16,.98) 65%);
+}
+.curtain.run{animation:curtainRun .7s var(--ease) both}
+@keyframes curtainRun{ 0%{opacity:0} 35%{opacity:1} 65%{opacity:1} 100%{opacity:0} }
+
+.section{ transition:filter .5s var(--ease); }
+.section.entering .container, .section.entering .summary-card{ animation:windowOpen .75s var(--ease) both; }
+@keyframes windowOpen{
+  from{ opacity:0; transform:translateY(22px) scale(.965); filter:blur(6px); }
+  to{ opacity:1; transform:none; filter:blur(0); }
+}
 </style>
 
 </head>
@@ -453,8 +523,12 @@ footer{ padding:0 20px 30px; text-align:center; color:var(--muted2); font-size:1
       <p class="section-copy">როდის შევიკრიბოთ?</p>
     </div>
 
-    <div class="time-grid reveal">
-      <div class="field glass"><label for="dateInput">თარიღი</label><input id="dateInput" type="date"></div>
+    <div class="field glass reveal" style="margin-bottom:11px">
+      <label class="date-strip-label">თარიღი</label>
+      <div class="date-strip" id="dateStrip"></div>
+    </div>
+
+    <div class="time-grid reveal" style="grid-template-columns:1fr">
       <div class="field glass"><label for="timeInput">შეკრების დრო</label><input id="timeInput" type="time"></div>
     </div>
 
@@ -531,13 +605,14 @@ footer{ padding:0 20px 30px; text-align:center; color:var(--muted2); font-size:1
 <footer>საძმაკაცოს საღამო · ერთი კარგი გეგმა</footer>
 
 <div class="toast glass" id="toast"></div>
+<div class="curtain" id="curtain"></div>
 
 <script>
 "use strict";
 
 const CONFIG = {
   title: "საძმაკაცოს საღამო",
-  members: ["დემე","გიორგი","ნიკა","დათო"],
+  members: ["დემე","გიორგი","ლუკა","საბა"],
 
   // SUPABASE — ჩასვი შენი Project URL და Publishable/Anon key
   supabaseUrl: "https://ioisupqgqwejwecqycfw.supabase.co",
@@ -570,6 +645,38 @@ const toast = $("#toast");
 
 function getInitials(name){ return name.split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase(); }
 function statusText(status){ if(status==="yes") return "მოვდივარ"; if(status==="maybe") return "არ ვიცი"; return "ვერ მოვდივარ"; }
+
+$$(".choice").forEach(card => {
+  if(!card.querySelector(".choice-voters")){
+    const span = document.createElement("span");
+    span.className = "choice-voters";
+    card.appendChild(span);
+  }
+});
+
+function renderChoiceVotes(){
+  const byGroup = { location:{}, activity:{}, food:{} };
+
+  CONFIG.members.forEach(name => {
+    const m = state.members[name] || {};
+    if(m.location) (byGroup.location[m.location] ||= []).push(name);
+    if(m.activity) (byGroup.activity[m.activity] ||= []).push(name);
+    (m.foods || []).forEach(f => (byGroup.food[f] ||= []).push(name));
+  });
+
+  $$(".choice").forEach(card => {
+    const group = card.dataset.group;
+    const value = card.dataset.value;
+    const names = (byGroup[group] && byGroup[group][value]) || [];
+    const voters = card.querySelector(".choice-voters");
+    if(!voters) return;
+    if(!names.length){ voters.textContent = ""; return; }
+    const prefix = group === "food"
+      ? (names.length > 1 ? "ირჩევენ: " : "ირჩევს: ")
+      : (names.length > 1 ? "აირჩიეს: " : "აირჩია: ");
+    voters.textContent = prefix + names.join(", ");
+  });
+}
 
 function renderMembers(){
   const container = $("#membersList");
@@ -604,6 +711,7 @@ function renderMembers(){
     `;
   }).join("");
   updateMembersInfo();
+  renderChoiceVotes();
 }
 
 $("#membersList").addEventListener("click", async event => {
@@ -653,13 +761,56 @@ $$(".choice").forEach(card => {
       $("#foodCount").textContent = state.foods.length;
       updateSummary();
     }
+
+    if(state.currentUser){
+      state.members[state.currentUser] = {
+        ...(state.members[state.currentUser] || {}),
+        location: state.location,
+        foods: state.foods,
+        activity: state.activity
+      };
+      renderMembers();
+      saveCurrentUser(false);
+    }
   });
 });
 
-const dateInput = $("#dateInput");
 const timeInput = $("#timeInput");
 
-dateInput.addEventListener("change", () => { state.date = dateInput.value; updateTimeInfo(); updateSummary(); });
+function toISODate(d){
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,"0"), day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+
+function renderDateStrip(){
+  const strip = $("#dateStrip");
+  const today = new Date();
+  const days = [];
+  for(let i=0;i<7;i++){
+    const d = new Date(today);
+    d.setDate(today.getDate()+i);
+    days.push(d);
+  }
+  strip.innerHTML = days.map((d,i) => {
+    const iso = toISODate(d);
+    const dow = new Intl.DateTimeFormat("ka-GE",{ weekday:"short" }).format(d).replace(".","");
+    return `<button class="date-pill glass${i===0?" today":""}" data-date="${iso}">
+      <span class="dow">${i===0?"დღეს":dow}</span>
+      <span class="dom">${d.getDate()}</span>
+    </button>`;
+  }).join("");
+}
+renderDateStrip();
+
+$("#dateStrip").addEventListener("click", event => {
+  const pill = event.target.closest(".date-pill");
+  if(!pill) return;
+  state.date = pill.dataset.date;
+  $$(".date-pill").forEach(p => p.classList.toggle("active", p === pill));
+  updateTimeInfo();
+  updateSummary();
+});
+
 timeInput.addEventListener("change", () => { state.time = timeInput.value; updateTimeInfo(); updateSummary(); });
 
 $$(".quick-time").forEach(button => {
@@ -716,17 +867,41 @@ function validateStep(target){
   return true;
 }
 
+const curtain = $("#curtain");
+
+function openWindow(targetId, originEvent){
+  const section = document.getElementById(targetId);
+  if(!section) return;
+
+  if(originEvent){
+    curtain.style.setProperty("--cx", originEvent.clientX + "px");
+    curtain.style.setProperty("--cy", originEvent.clientY + "px");
+  }
+  curtain.classList.remove("run");
+  void curtain.offsetWidth;
+  curtain.classList.add("run");
+
+  setTimeout(() => {
+    section.scrollIntoView({ behavior:"smooth", block:"start" });
+    section.classList.remove("entering");
+    void section.offsetWidth;
+    section.classList.add("entering");
+    setTimeout(() => section.classList.remove("entering"), 800);
+  }, 260);
+
+  setTimeout(() => curtain.classList.remove("run"), 720);
+}
+
 $$(".next-btn").forEach(button => {
-  button.addEventListener("click", () => {
+  button.addEventListener("click", event => {
     const target = button.dataset.next;
     if(!validateStep(target)) return;
-    const section = document.getElementById(target);
-    if(section) section.scrollIntoView({ behavior:"smooth", block:"start" });
+    openWindow(target, event);
   });
 });
 
-$("#startBtn").addEventListener("click", () => {
-  $("#locationSection").scrollIntoView({ behavior:"smooth", block:"start" });
+$("#startBtn").addEventListener("click", event => {
+  openWindow("locationSection", event);
 });
 
 $("#confirmBtn").addEventListener("click", async () => {
@@ -934,7 +1109,7 @@ function syncLocalUI(){
   );
   if(state.activity) updateActivityInfo();
 
-  dateInput.value = state.date || "";
+  $$(".date-pill").forEach(p => p.classList.toggle("active", p.dataset.date === state.date));
   timeInput.value = state.time || "";
   $$(".quick-time").forEach(item =>
     item.classList.toggle("active", item.dataset.time === state.time)
@@ -946,7 +1121,10 @@ function renderIdentityChooser(){
   const list = $("#identityList");
 
   list.innerHTML = CONFIG.members.map(name =>
-    `<button class="identity-btn" data-identity="${escapeHTML(name)}">${escapeHTML(name)}</button>`
+    `<button class="identity-btn" data-identity="${escapeHTML(name)}">
+       <span class="identity-avatar">${getInitials(name)}</span>
+       <span class="identity-btn-name">${escapeHTML(name)}</span>
+     </button>`
   ).join("");
 
   list.addEventListener("click", event => {
@@ -970,7 +1148,11 @@ async function enterAsSelectedUser(){
   await loadSharedData();
 
   const saved = state.members[state.currentUser];
-  if(saved && saved.status !== "unknown"){
+  const hasSavedAnswers = saved && (
+    saved.status !== "unknown" || saved.location || saved.activity ||
+    (saved.foods && saved.foods.length) || saved.date || saved.time
+  );
+  if(hasSavedAnswers){
     state.location = saved.location || null;
     state.foods = saved.foods || [];
     state.activity = saved.activity || null;
